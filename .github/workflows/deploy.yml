@@ -1,11 +1,11 @@
-name: N95 News • Sync YouTube and Deploy
+name: N95 News - Sync YouTube and Deploy
 
 on:
   push:
     branches: [main]
   workflow_dispatch:
   schedule:
-    - cron: '17 */4 * * *'  # approximately every 4 hours, UTC; GitHub may delay scheduled runs
+    - cron: '17 */4 * * *'
 
 permissions:
   contents: read
@@ -13,8 +13,8 @@ permissions:
   id-token: write
 
 concurrency:
-  group: n95-news-github-pages
-  cancel-in-progress: true
+  group: n95-news-pages
+  cancel-in-progress: false
 
 jobs:
   build-and-deploy:
@@ -22,70 +22,78 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
+
     steps:
-      - name: Checkout source
+      - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
+      - name: Set up Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: '22'
+          cache: npm
+          cache-dependency-path: package-lock.json
 
-      - name: Install packages
+      - name: Install dependencies
         run: |
-          if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi
+          if [ -f package-lock.json ]; then
+            npm ci --no-audit --no-fund
+          else
+            npm install --no-audit --no-fund
+          fi
 
-      # Preserve historical videos between ephemeral GitHub Actions runners.
-      - name: Restore the latest cached video archive
+      - name: Restore previously fetched videos
         uses: actions/cache/restore@v4
         with:
           path: public/data/videos.json
-          key: n95-video-archive-${{ github.ref_name }}-${{ github.run_id }}
+          key: n95-videos-${{ github.ref_name }}-${{ github.run_id }}
           restore-keys: |
-            n95-video-archive-${{ github.ref_name }}-
+            n95-videos-${{ github.ref_name }}-
 
-      - name: Refresh YouTube news feed
-        # Default uses public Atom feed. Optional YOUTUBE_API_KEY uses Data API v3.
-        # Cached feed is preserved if YouTube temporarily refuses the request.
+      - name: Sync latest N95 YouTube uploads
         continue-on-error: true
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
         run: npm run sync:youtube
 
-      - name: Save refreshed video archive
+      - name: Save video archive
+        if: hashFiles('public/data/videos.json') != ''
         uses: actions/cache/save@v4
         with:
           path: public/data/videos.json
-          key: n95-video-archive-${{ github.ref_name }}-${{ github.run_id }}
+          key: n95-videos-${{ github.ref_name }}-${{ github.run_id }}
 
-      - name: Set GitHub Pages base path
+      - name: Determine GitHub Pages base path
         id: base
         shell: bash
         run: |
           REPO_NAME="${GITHUB_REPOSITORY#*/}"
           if [[ "$REPO_NAME" == *.github.io ]]; then
-            echo "href=/" >> "$GITHUB_OUTPUT"
+            echo 'href=/' >> "$GITHUB_OUTPUT"
           else
             echo "href=/$REPO_NAME/" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Build Angular 21 static website
+      - name: Build Angular 21 website
         run: npx ng build --configuration production --base-href "${{ steps.base.outputs.href }}"
 
-      - name: Prepare SPA fallback for GitHub Pages
+      - name: Verify and prepare static files
         shell: bash
         run: |
+          test -f dist/n95-news/browser/index.html || { echo 'Angular index.html not found. Check angular.json outputPath.'; exit 1; }
           cp dist/n95-news/browser/index.html dist/n95-news/browser/404.html
           touch dist/n95-news/browser/.nojekyll
 
+      # REQUIREMENT: Repository Settings > Pages > Build and deployment > Source = GitHub Actions.
+      # The workflow cannot enable GitHub Pages for a repository that has not been configured.
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload static website artifact
+      - name: Upload GitHub Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist/n95-news/browser
 
-      - name: Publish website
+      - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v4
