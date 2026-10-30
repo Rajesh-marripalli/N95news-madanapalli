@@ -1,0 +1,6 @@
+:root{--navy:#111a3a;--deep:#0a1230;--red:#ba1725;--red-dark:#990d19;--text:#182336;--muted:#657087;--line:#e5e9f0;--bg:#f7f8fc;--white:#fff;--te:'Noto Sans Telugu',sans-serif;--en:'Inter',sans-serif}
+*,*::before,*::after{box-sizing:border-box}
+html{scroll-behavior:smooth;scroll-padding-top:100px}
+body{margin:0;background:var(--white);color:var(--text);font-family:var(--te);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+button,input{font:inherit}button{cursor:pointer}a{color:inherit;text-decoration:none}img{max-width:100%;display:block}button:focus-visible,a:focus-visible,input:focus-visible{outline:3px solid #2a76d2;outline-offset:3px}
+::selection{background:#ffe3e6;color:var(--navy)}

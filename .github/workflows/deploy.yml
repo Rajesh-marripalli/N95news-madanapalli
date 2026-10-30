@@ -1,0 +1,91 @@
+name: N95 News • Sync YouTube and Deploy
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+  schedule:
+    - cron: '17 */4 * * *'  # approximately every 4 hours, UTC; GitHub may delay scheduled runs
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: n95-news-github-pages
+  cancel-in-progress: true
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Install packages
+        run: |
+          if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi
+
+      # Preserve historical videos between ephemeral GitHub Actions runners.
+      - name: Restore the latest cached video archive
+        uses: actions/cache/restore@v4
+        with:
+          path: public/data/videos.json
+          key: n95-video-archive-${{ github.ref_name }}-${{ github.run_id }}
+          restore-keys: |
+            n95-video-archive-${{ github.ref_name }}-
+
+      - name: Refresh YouTube news feed
+        # Default uses public Atom feed. Optional YOUTUBE_API_KEY uses Data API v3.
+        # Cached feed is preserved if YouTube temporarily refuses the request.
+        continue-on-error: true
+        env:
+          YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+        run: npm run sync:youtube
+
+      - name: Save refreshed video archive
+        uses: actions/cache/save@v4
+        with:
+          path: public/data/videos.json
+          key: n95-video-archive-${{ github.ref_name }}-${{ github.run_id }}
+
+      - name: Set GitHub Pages base path
+        id: base
+        shell: bash
+        run: |
+          REPO_NAME="${GITHUB_REPOSITORY#*/}"
+          if [[ "$REPO_NAME" == *.github.io ]]; then
+            echo "href=/" >> "$GITHUB_OUTPUT"
+          else
+            echo "href=/$REPO_NAME/" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build Angular 21 static website
+        run: npx ng build --configuration production --base-href "${{ steps.base.outputs.href }}"
+
+      - name: Prepare SPA fallback for GitHub Pages
+        shell: bash
+        run: |
+          cp dist/n95-news/browser/index.html dist/n95-news/browser/404.html
+          touch dist/n95-news/browser/.nojekyll
+
+      - name: Configure GitHub Pages
+        uses: actions/configure-pages@v5
+
+      - name: Upload static website artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist/n95-news/browser
+
+      - name: Publish website
+        id: deployment
+        uses: actions/deploy-pages@v4

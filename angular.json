@@ -1,0 +1,50 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "newProjectRoot": "projects",
+  "projects": {
+    "n95-news": {
+      "projectType": "application",
+      "schematics": {},
+      "root": "",
+      "sourceRoot": "src",
+      "prefix": "app",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:application",
+          "options": {
+            "outputPath": "dist/n95-news",
+            "index": "src/index.html",
+            "browser": "src/main.ts",
+            "polyfills": [],
+            "tsConfig": "tsconfig.app.json",
+            "assets": [{"glob": "**/*", "input": "public"}],
+            "styles": ["src/styles.scss"]
+          },
+          "configurations": {
+            "production": {
+              "budgets": [
+                {"type": "initial", "maximumWarning": "800kB", "maximumError": "1500kB"},
+                {"type": "anyComponentStyle", "maximumWarning": "18kB", "maximumError": "30kB"}
+              ],
+              "outputHashing": "all"
+            },
+            "development": {"optimization": false, "extractLicenses": false, "sourceMap": true}
+          },
+          "defaultConfiguration": "production"
+        },
+        "serve": {
+          "builder": "@angular/build:dev-server",
+          "configurations": {
+            "production": {"buildTarget": "n95-news:build:production"},
+            "development": {"buildTarget": "n95-news:build:development"}
+          },
+          "defaultConfiguration": "development"
+        }
+      }
+    }
+  },
+  "cli": {
+    "analytics": "c6bea371-1da0-473e-8586-5fc19d895e33"
+  }
+}
