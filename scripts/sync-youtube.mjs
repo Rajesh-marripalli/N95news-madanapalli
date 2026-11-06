@@ -1,7 +1,7 @@
 /**
  * N95 News YouTube sync, designed for GitHub Actions.
  * Default: YouTube's public Atom feed (no credentials, usually ~15 recent posts).
- * Optional: YouTube Data API v3 with YOUTUBE_API_KEY (up to 50 recent uploads).
+ * Optional: YouTube Data API v3 with YOUTUBE_API_KEY, paginates the full uploads playlist.
  * Merges each successful fetch into a bounded local archive.
  * The browser NEVER receives the API key.
  */
@@ -12,7 +12,7 @@ import { XMLParser } from 'fast-xml-parser';
 const CHANNEL_ID = 'UChm8ZVGKr5RL3YZoxDkoSaA';
 const DATA_PATH = resolve('public/data/videos.json');
 const VALID_ID = /^[A-Za-z0-9_-]{11}$/;
-const MAX_ARCHIVE = 150;
+const MAX_ARCHIVE = Math.max(50, Math.min(2000, Number.parseInt(process.env.YOUTUBE_ARCHIVE_LIMIT || "500", 10) || 500));
 
 function classify(title, description = '') {
   const text = `${title} ${description}`.toLocaleLowerCase();
@@ -53,10 +53,19 @@ async function fromDataApi(key) {
   const channels = await fetchJson(channelsUrl);
   const uploads = channels.items?.[0]?.contentDetails?.relatedPlaylists?.uploads;
   if (!uploads) throw new Error('Channel uploads playlist not found. Check your YouTube API key.');
-  const playlistUrl = new URL('https://www.googleapis.com/youtube/v3/playlistItems');
-  playlistUrl.search = new URLSearchParams({ part: 'snippet,contentDetails', playlistId: uploads, maxResults: '50', key }).toString();
-  const playlist = await fetchJson(playlistUrl);
-  return (playlist.items ?? []).map(item => {
+  const collected = [];
+  let pageToken = '';
+  const maxPages = Math.ceil(MAX_ARCHIVE / 50);
+  for (let page = 0; page < maxPages; page++) {
+    const playlistUrl = new URL('https://www.googleapis.com/youtube/v3/playlistItems');
+    playlistUrl.search = new URLSearchParams({ part: 'snippet,contentDetails', playlistId: uploads, maxResults: '50', key, ...(pageToken ? {pageToken} : {}) }).toString();
+    const playlist = await fetchJson(playlistUrl);
+    collected.push(...(playlist.items ?? []));
+    pageToken = playlist.nextPageToken || '';
+    if (!pageToken) break;
+  }
+  console.log(`YouTube Data API returned ${collected.length} uploaded-video entries.`);
+  return collected.map(item => {
     const snip = item.snippet ?? {};
     if (snip.title === 'Private video' || snip.title === 'Deleted video') return null;
     const videoId = item.contentDetails?.videoId ?? snip.resourceId?.videoId;

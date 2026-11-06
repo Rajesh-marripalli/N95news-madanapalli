@@ -1,4 +1,4 @@
-name: N95 News - Sync YouTube and Deploy
+name: N95 News - YouTube, Gemini Telugu News and Pages
 
 on:
   push:
@@ -8,7 +8,7 @@ on:
     - cron: '17 */4 * * *'
 
 permissions:
-  contents: read
+  contents: write    # commit video/news JSON archives back to main for durable storage
   pages: write
   id-token: write
 
@@ -22,74 +22,76 @@ jobs:
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
-
     steps:
-      - name: Checkout repository
+      - name: Checkout main
         uses: actions/checkout@v4
+        with:
+          ref: main
+          persist-credentials: true
 
-      - name: Set up Node.js 22
+      - name: Node.js 22
         uses: actions/setup-node@v4
         with:
           node-version: '22'
-          cache: npm
-          cache-dependency-path: package-lock.json
 
       - name: Install dependencies
         run: |
-          if [ -f package-lock.json ]; then
-            npm ci --no-audit --no-fund
-          else
-            npm install --no-audit --no-fund
-          fi
+          if [ -f package-lock.json ]; then npm ci; else npm install --no-audit --no-fund; fi
 
-      - name: Restore previously fetched videos
-        uses: actions/cache/restore@v4
-        with:
-          path: public/data/videos.json
-          key: n95-videos-${{ github.ref_name }}-${{ github.run_id }}
-          restore-keys: |
-            n95-videos-${{ github.ref_name }}-
-
-      - name: Sync latest N95 YouTube uploads
+      - name: Update latest and historical YouTube videos
+        # On a temporary YouTube outage, keep the previous feed and still deploy.
         continue-on-error: true
         env:
           YOUTUBE_API_KEY: ${{ secrets.YOUTUBE_API_KEY }}
+          YOUTUBE_ARCHIVE_LIMIT: '500'
         run: npm run sync:youtube
 
-      - name: Save video archive
-        if: hashFiles('public/data/videos.json') != ''
-        uses: actions/cache/save@v4
-        with:
-          path: public/data/videos.json
-          key: n95-videos-${{ github.ref_name }}-${{ github.run_id }}
+      - name: Summarize spoken news with Gemini
+        # Runs server-side, never exposes GEMINI_API_KEY in public Angular code.
+        # Each public video is processed once; failures retain prior summaries.
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          GEMINI_MODEL: gemini-3.8-flash
+          GEMINI_MAX_PER_RUN: '8'
+        run: npm run summarize:news
 
-      - name: Determine GitHub Pages base path
+      - name: Persist updated videos and summaries
+        # Unlike Actions cache, committed JSON remains available on future runs.
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add public/data/videos.json public/data/news.json
+          if ! git diff --cached --quiet; then
+            git commit -m "data: refresh N95 news [skip ci]"
+            git push origin HEAD:main
+          else
+            echo "No new video or summary data to commit."
+          fi
+
+      - name: Compute GitHub Pages base href
         id: base
         shell: bash
         run: |
           REPO_NAME="${GITHUB_REPOSITORY#*/}"
-          if [[ "$REPO_NAME" == *.github.io ]]; then
-            echo 'href=/' >> "$GITHUB_OUTPUT"
+          if [[ "${REPO_NAME,,}" == *.github.io ]]; then
+            echo "href=/" >> "$GITHUB_OUTPUT"
           else
             echo "href=/$REPO_NAME/" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: Build Angular 21 website
+      - name: Build Angular 21
         run: npx ng build --configuration production --base-href "${{ steps.base.outputs.href }}"
 
-      - name: Verify and prepare static files
-        shell: bash
+      - name: SPA fallback and disable Jekyll
         run: |
-          test -f dist/n95-news/browser/index.html || { echo 'Angular index.html not found. Check angular.json outputPath.'; exit 1; }
           cp dist/n95-news/browser/index.html dist/n95-news/browser/404.html
           touch dist/n95-news/browser/.nojekyll
 
-      # REQUIREMENT: Repository Settings > Pages > Build and deployment > Source = GitHub Actions.
-      # The workflow cannot enable GitHub Pages for a repository that has not been configured.
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
-      - name: Upload GitHub Pages artifact
+      - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
         with:
           path: dist/n95-news/browser

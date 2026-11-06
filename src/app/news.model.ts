@@ -10,6 +10,25 @@ export interface NewsVideo {
   category: Exclude<Category, 'all'>;
 }
 
+export interface NewsArticle {
+  videoId: string;
+  headline: string;
+  lead?: string;
+  summary: string;
+  keyPoints: string[];
+  location: string;
+  generatedAt: string;
+  model: string;
+  status: 'ai_draft' | 'reviewed';
+  source: string;
+}
+
+export interface NewsArticleFeed {
+  channelId: string;
+  generatedAt: string | null;
+  articles: NewsArticle[];
+}
+
 export interface NewsFeed {
   channelId: string;
   source: string;

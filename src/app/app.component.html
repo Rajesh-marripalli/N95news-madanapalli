@@ -19,8 +19,8 @@
     </a>
     <nav class="desktop-nav" aria-label="ప్రధాన నావిగేషన్">
       <a href="#top" class="nav-active">హోమ్</a>
-      <a href="#latest-news">తాజా వార్తలు</a>
-      <a href="#categories">విభాగాలు</a>
+      <a href="#latest-news">వార్తలు చదవండి</a>
+      <a href="#local-info">స్థానిక సమాచారం</a>
       <a href="#about">మా గురించి</a>
     </nav>
     <div class="header-actions">
@@ -37,7 +37,7 @@
     <nav class="mobile-nav" id="mobile-navigation" aria-label="మొబైల్ నావిగేషన్">
       <a href="#top" (click)="mobileMenuOpen.set(false)">హోమ్</a>
       <a href="#latest-news" (click)="mobileMenuOpen.set(false)">తాజా వార్తలు</a>
-      <a href="#categories" (click)="mobileMenuOpen.set(false)">విభాగాలు</a>
+      <a href="#local-info" (click)="mobileMenuOpen.set(false)">స్థానిక సమాచారం</a>
       <a href="#about" (click)="mobileMenuOpen.set(false)">మా గురించి</a>
       <a [href]="channelUrl" target="_blank" rel="noopener noreferrer">YouTube ఛానల్ ↗</a>
     </nav>
@@ -56,79 +56,137 @@
   <section class="intro-section container">
     <div class="intro-copy">
       <span class="eyebrow"><span class="eyebrow-line"></span> THE VOICE OF MADANAPALLE</span>
-      <h1>ప్రజల గొంతుక.<br><span>మీ ప్రాంతం వార్తలు.</span></h1>
-      <p>మదనపల్లె మరియు పరిసర ప్రాంతాల తాజా సమాచారం, ప్రజా సమస్యలు, వీడియో రిపోర్టులు — అన్నీ ఒకే చోట.</p>
-    </div>
-    <div class="intro-aside">
-      <span class="intro-aside-kicker">N95 NEWS NETWORK</span>
-      <span class="intro-aside-mark">95<span class="intro-aside-star">✳</span></span>
-      <span class="intro-aside-caption">LOCAL STORIES.<br>REAL VOICES.</span>
+      <div class="motto-heading"><span class="motto-red-line" aria-hidden="true"></span><h1>ప్రధాన వార్తలు</h1><span class="motto-red-line" aria-hidden="true"></span></div>
+      <p>అనుక్షణం ప్రజలపక్షం... మదనపల్లె ప్రజల మాట, ప్రాంతానికి సంబంధించిన వార్తలు.</p>
     </div>
   </section>
 
   <section class="container hero-section" aria-labelledby="hero-title">
-    <div class="section-topline"><span class="section-count">01 / FEATURED</span><span class="line-fill"></span><span class="section-topline-end">VIDEO JOURNALISM</span></div>
-    <div class="section-heading-row"><div><span class="overline">N95 NEWS BULLETIN</span><h2 id="hero-title">ప్రధాన వార్తలు <span class="accent-period">.</span></h2></div><a [href]="channelUrl" target="_blank" rel="noopener noreferrer" class="subtle-link">యూట్యూబ్ ఛానల్ చూడండి <span aria-hidden="true">↗</span></a></div>
-
+    <div class="section-topline"><span class="section-count">N95 / VIDEO REPORT</span><span class="line-fill"></span><a [href]="channelUrl" target="_blank" rel="noopener noreferrer" class="section-topline-end hero-channel-link">YOUTUBE CHANNEL ↗</a></div>
     @if (loading()) {
-      <div class="hero-grid"><div class="skeleton feature-skeleton"></div><div class="skeleton sidebar-skeleton"></div></div>
+      <div class="featured-video-shell skeleton feature-skeleton"></div>
     } @else if (featured(); as lead) {
-      <div class="hero-grid">
-        <article class="lead-story">
-          <button type="button" class="lead-visual play-target" [attr.aria-label]="lead.title + ' వీడియో చూడండి'" (click)="openVideo(lead)">
-            <img [src]="lead.thumbnail" [alt]="lead.title" fetchpriority="high" />
-            <span class="image-shade"></span><span class="visual-label"><span class="red-dot"></span> TOP STORY</span><span class="play-bubble"><span>▶</span></span>
-          </button>
-          <div class="lead-info"><div class="story-meta"><span>వీడియో రిపోర్ట్</span><span class="meta-dot"></span><time [attr.datetime]="lead.publishedAt">{{ formatDate(lead.publishedAt) }}</time></div><h3>{{ lead.title }}</h3><div class="story-actions"><button type="button" class="text-link" (click)="openVideo(lead)">పూర్తి వీడియో చూడండి <span aria-hidden="true">↗</span></button><a [href]="shareUrl(lead)" target="_blank" rel="noopener noreferrer" class="share-link" aria-label="వాట్సాప్‌లో షేర్ చేయండి">↗ <span>SHARE</span></a></div></div>
-        </article>
-        <aside class="top-stories" aria-label="ఇతర వార్తలు">
-          <div class="side-title"><span class="side-title-icon">≡</span><span>LATEST UPDATES</span><span class="side-title-count">{{ highlights().length }}</span></div>
-          @for (video of highlights(); track video.id; let i = $index) {
-            <article class="side-story"><span class="side-number">0{{ i + 1 }}</span><button type="button" class="side-photo" (click)="openVideo(video)" [attr.aria-label]="video.title"><img [src]="video.thumbnail" [alt]="video.title" loading="lazy" /></button><div class="side-copy"><span class="side-kicker">N95 REPORT <span>•</span> {{ formatDate(video.publishedAt) }}</span><button type="button" class="side-headline" (click)="openVideo(video)">{{ video.title }}</button></div></article>
-          }
-          @if (highlights().length === 0) {<div class="sidebar-empty">మరిన్ని వీడియోలు ప్రచురించినప్పుడు ఇక్కడ కనిపిస్తాయి.</div>}
-          <button type="button" class="side-footer" (click)="goTo('latest-news')">అన్ని వీడియోలు చూడండి <span aria-hidden="true">↗</span></button>
-        </aside>
-      </div>
+      <article class="lead-story featured-video-story">
+        <div class="featured-video-shell"><iframe [src]="featuredEmbedUrl()" [title]="lead.title" loading="eager" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+        <div class="lead-info"><div class="story-meta"><span>తాజా వీడియో రిపోర్ట్</span><span class="meta-dot"></span><time [attr.datetime]="lead.publishedAt">{{ formatDate(lead.publishedAt) }}</time></div><h2 id="hero-title">{{ articleFor(lead)?.headline || lead.title }}</h2>@if (articleFor(lead); as leadArticle) {<p class="lead-ai-teaser">{{ leadArticle.lead || leadArticle.summary }}</p>}<div class="story-actions">@if (articleFor(lead)) {<button type="button" class="text-link" (click)="readArticle(lead)">📖 పూర్తి వార్త చదవండి</button>}<a [href]="lead.url" target="_blank" rel="noopener noreferrer" class="text-link">యూట్యూబ్‌లో చూడండి ↗</a><a [href]="shareUrl(lead)" target="_blank" rel="noopener noreferrer" class="share-link" aria-label="వాట్సాప్‌లో షేర్ చేయండి">↗ <span>షేర్</span></a></div></div>
+      </article>
     } @else {
-      <div class="hero-grid">
-        <div class="hero-placeholder"><div class="hero-pattern"><span class="hero-pattern-circle"></span><span class="placeholder-issue">N95 / NEWS</span><span class="placeholder-giant">MPL</span></div><div class="placeholder-content"><span class="placeholder-pill">మదనపల్లె • తెలుగు న్యూస్</span><h3>వార్తలు నేరుగా<br><span>మీ ముందుకు.</span></h3><p>మా యూట్యూబ్ ఛానల్‌లో తాజా వీడియో రిపోర్టులు చూడండి. మొదటి ఆటోమేటిక్ సింక్ పూర్తయ్యాక ఇక్కడ వీడియోలు కనిపిస్తాయి.</p><a [href]="channelUrl" target="_blank" rel="noopener noreferrer" class="light-btn">YouTube లో చూడండి ↗</a></div></div>
-        <div class="first-sync-panel"><span class="small-red-label">N95 DIGITAL</span><h3>అనుక్షణం<br>ప్రజలపక్షం...</h3><p>స్థానిక ప్రజల జీవితాలను ప్రభావితం చేసే వార్తలకు మీ వేదిక.</p><div class="sync-note"><span class="sync-note-circle">↻</span><div><strong>వీడియో ఫీడ్ సిద్ధంగా ఉంది</strong><span>కొత్త YouTube వీడియోలు షెడ్యూల్ ప్రకారం చేరతాయి.</span></div></div><a [href]="channelUrl" target="_blank" rel="noopener noreferrer">వీడియోలు చూడండి <span aria-hidden="true">↗</span></a></div>
-      </div>
+      <div class="hero-placeholder"><div class="hero-pattern"><span class="hero-pattern-circle"></span><span class="placeholder-issue">N95 / NEWS</span><span class="placeholder-giant">MPL</span></div><div class="placeholder-content"><span class="placeholder-pill">మదనపల్లె • తెలుగు న్యూస్</span><h2>వార్తలు నేరుగా<br><span>మీ ముందుకు.</span></h2><p>కొత్త వీడియో రిపోర్టులు ప్రచురించినప్పుడు ఇక్కడ కనిపిస్తాయి. అప్పటివరకు మా అధికారిక YouTube ఛానల్‌లో చూడండి.</p><a [href]="channelUrl" target="_blank" rel="noopener noreferrer" class="light-btn">YouTube లో చూడండి ↗</a></div></div>
     }
   </section>
 
-  <section class="principles-band" aria-label="N95 News గురించి">
-    <div class="container principles-inner"><span class="principles-heading">OUR FOCUS</span><span class="principles-rule"></span><span class="principle-item"><span>01</span> స్థానిక వార్తలు</span><span class="principle-item"><span>02</span> ప్రజా సమస్యలు</span><span class="principle-item"><span>03</span> సమాజం కోసం</span><span class="principle-end">N95 / MPL</span></div>
-  </section>
-
   <section class="container latest-section" id="latest-news" aria-labelledby="latest-heading">
-    <div class="section-topline"><span class="section-count">02 / THE LATEST</span><span class="line-fill"></span><span class="section-topline-end">STAY INFORMED</span></div>
-    <div class="section-heading-row latest-title-row"><div><span class="overline">DISCOVER THE STORIES</span><h2 id="latest-heading">తాజా వీడియో వార్తలు <span class="accent-period">.</span></h2></div><span class="feed-badge"><span class="feed-badge-dot"></span>{{ feed()?.lastSyncedAt ? 'AUTO-UPDATED' : 'YOUTUBE FEED' }}</span></div>
-    <div class="filter-bar"><div class="filter-scroll" aria-label="వార్తల విభాగాలు">@for (category of categories; track category.id) {<button type="button" class="filter-chip" [class.selected]="activeCategory() === category.id" [attr.aria-pressed]="activeCategory() === category.id" (click)="chooseCategory(category.id, false)">{{ category.label }}</button>}</div><form class="search-form" role="search" (submit)="onSearchSubmit($event)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.9" cy="10.9" r="6.8"/><path d="m16 16 5 5"/></svg><input #searchInput type="search" [value]="searchTerm()" (input)="searchTerm.set(searchInput.value)" placeholder="వార్తల కోసం వెతకండి..." aria-label="వార్తల కోసం వెతకండి"><button type="submit" aria-label="వెతకండి">↵</button></form></div>
+    <div class="section-topline"><span class="section-count">అన్ని తాజా వార్తలు</span><span class="line-fill"></span><span class="section-topline-end">N95 NEWS • MADANAPALLE</span></div>
+    <div class="section-heading-row latest-title-row"><div><span class="overline">NEWS THAT MATTERS</span><h2 id="latest-heading">ప్రజలకు ముఖ్యమైన వార్తలు <span class="accent-period">.</span></h2></div><span class="feed-badge"><span class="feed-badge-dot"></span> {{ summarizedCount() }} / {{ videos().length }} వీడియోలకు వార్తా సారాంశం</span></div>
+    <div class="filter-bar"><label class="readable-only-toggle"><input type="checkbox" [checked]="onlyReadable()" (change)="onlyReadable.set($any($event.target).checked); showCount.set(9)"><span>📖 చదవదగిన వార్తలు మాత్రమే</span></label><form class="search-form" role="search" (submit)="onSearchSubmit($event)"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.9" cy="10.9" r="6.8"/><path d="m16 16 5 5"/></svg><input #searchInput type="search" [value]="searchTerm()" (input)="searchTerm.set(searchInput.value)" placeholder="వార్తల కోసం వెతకండి..." aria-label="వార్తల కోసం వెతకండి"><button type="submit" aria-label="వెతకండి">↵</button></form></div>
     @if (loading()) {
       <div class="news-grid">@for (placeholder of [1, 2, 3, 4, 5, 6]; track placeholder) {<div class="skeleton card-skeleton"></div>}</div>
     } @else if (matchingVideos().length > 0) {
       <div class="news-grid">
         @for (video of visibleVideos(); track video.id; let index = $index) {
-          <article class="news-card"><button type="button" class="card-image play-target" [attr.aria-label]="video.title + ' వీడియో చూడండి'" (click)="openVideo(video)"><img [src]="video.thumbnail" [alt]="video.title" loading="lazy"><span class="card-play">▶</span><span class="card-type">VIDEO NEWS</span></button><div class="card-body"><div class="story-meta"><span>N95 NEWS</span><span class="meta-dot"></span><time [attr.datetime]="video.publishedAt">{{ formatDate(video.publishedAt) }}</time></div><button type="button" class="card-title" (click)="openVideo(video)">{{ video.title }}</button><div class="card-footer"><button type="button" class="card-watch" (click)="openVideo(video)">వీడియో చూడండి <span aria-hidden="true">↗</span></button><a [href]="shareUrl(video)" target="_blank" rel="noopener noreferrer" aria-label="వాట్సాప్ షేర్" class="card-share">SHARE ↗</a></div></div></article>
+          <article class="news-card readable-news-card">
+            <button type="button" class="card-image play-target" [attr.aria-label]="video.title + ' వీడియో చూడండి'" (click)="openVideo(video)">
+              <img [src]="video.thumbnail" [alt]="video.title" loading="lazy">
+              <span class="card-play">▶</span><span class="card-type">N95 NEWS</span>
+            </button>
+            <div class="card-body readable-card-body">
+              <div class="story-meta"><span>N95 NEWS • తెలుగు</span><span class="meta-dot"></span><time [attr.datetime]="video.publishedAt">{{ formatDate(video.publishedAt) }}</time></div>
+              @if (articleFor(video); as article) {
+                <span class="ai-disclosure">✦ {{ article.status === 'reviewed' ? 'సంపాదకీయం పరిశీలించిన వార్త' : 'AI రూపొందించిన సారాంశం' }} · 1 నిమిషంలో చదవండి</span>
+                <h3 class="readable-headline">{{ article.headline }}</h3>
+                @if (article.lead) {<p class="news-lead">{{ article.lead }}</p>}
+                <div class="readable-label">వార్త సారాంశం</div>
+                <p class="readable-summary">{{ article.summary }}</p>
+                <div class="readable-label">ముఖ్యాంశాలు</div>
+                <ul class="readable-points">@for (point of article.keyPoints.slice(0,3); track $index) { <li>{{ point }}</li> }</ul>
+                @if (article.status !== 'reviewed') {
+                  <p class="ai-caution">AI సారాంశం. ఖచ్చితమైన వివరాల కోసం అసలు వీడియోను పరిశీలించండి.</p>
+                }
+                <div class="readable-actions">
+                  <button type="button" class="read-btn" (click)="readArticle(video)">📖 పూర్తి వార్త చదవండి</button>
+                  <button type="button" class="watch-btn" (click)="openVideo(video)">▶ వీడియో చూడండి</button>
+                  <a [href]="shareUrl(video)" target="_blank" rel="noopener noreferrer" class="share-btn" aria-label="వాట్సాప్‌లో షేర్ చేయండి">షేర్ ↗</a>
+                </div>
+              } @else {
+                <h3 class="readable-headline">{{ video.title }}</h3>
+                <p class="summary-pending">ఈ రిపోర్ట్‌లో చెప్పిన విషయాలపై AI తెలుగు సారాంశం ఇంకా అందుబాటులో లేదు. పూర్తి సమాచారం కోసం వీడియో చూడండి.</p>
+                <div class="readable-actions">
+                  <button type="button" class="watch-btn" (click)="openVideo(video)">▶ వీడియో చూడండి</button>
+                  <a [href]="shareUrl(video)" target="_blank" rel="noopener noreferrer" class="share-btn">షేర్ ↗</a>
+                </div>
+              }
+            </div>
+          </article>
         }
       </div>
       @if (hasMore()) {<div class="show-more-wrap"><button type="button" class="more-btn" (click)="showMore()">మరిన్ని వార్తలు చూడండి <span aria-hidden="true">↓</span></button></div>}
     } @else {
-      <div class="empty-results"><span class="empty-graphic">◌</span><h3>{{ searchTerm() || activeCategory() !== 'all' ? 'ఈ విభాగంలో వీడియోలు దొరకలేదు' : 'కొత్త వార్తలు త్వరలో ఇక్కడ కనిపిస్తాయి' }}</h3><p>{{ loadFailed() ? 'వీడియో డేటా తెరవడంలో సమస్య వచ్చింది. దయచేసి మళ్లీ ప్రయత్నించండి.' : 'N95 News యూట్యూబ్ ఛానల్‌లో వార్తలు చూడవచ్చు. ఆటోమేటిక్ సింక్ తర్వాత వీడియోలు ఇక్కడ కనిపిస్తాయి.' }}</p><div class="empty-actions"><button type="button" class="outlined-btn" (click)="clearSearch()">అన్ని వార్తలు</button><a class="filled-btn" [href]="channelUrl" target="_blank" rel="noopener noreferrer">YouTube కి వెళ్లండి ↗</a></div></div>
+      <div class="empty-results"><span class="empty-graphic">◌</span><h3>{{ searchTerm() ? 'ఈ పదంతో వార్తలు దొరకలేదు' : 'కొత్త వార్తలు త్వరలో ఇక్కడ కనిపిస్తాయి' }}</h3><p>{{ loadFailed() ? 'వీడియో డేటా తెరవడంలో సమస్య వచ్చింది. దయచేసి మళ్లీ ప్రయత్నించండి.' : 'N95 News యూట్యూబ్ ఛానల్‌లో వార్తలు చూడవచ్చు. ఆటోమేటిక్ సింక్ తర్వాత వీడియోలు ఇక్కడ కనిపిస్తాయి.' }}</p><div class="empty-actions"><button type="button" class="outlined-btn" (click)="clearSearch()">అన్ని వార్తలు</button><a class="filled-btn" [href]="channelUrl" target="_blank" rel="noopener noreferrer">YouTube కి వెళ్లండి ↗</a></div></div>
     }
     @if (feed()?.lastSyncedAt; as updated) {<div class="feed-updated">↻ చివరి వీడియో సింక్: {{ updated | date:'dd MMM yyyy, hh:mm a':'+0530' }} IST · వీడియోల సంఖ్య: {{ videos().length }}</div>}
   </section>
 
-  <section class="category-section" id="categories" aria-labelledby="category-title"><div class="container"><div class="section-topline"><span class="section-count">03 / EXPLORE</span><span class="line-fill"></span><span class="section-topline-end">YOUR COMMUNITY</span></div><div class="section-heading-row"><div><span class="overline">NEWS THAT MATTERS</span><h2 id="category-title">వార్తల విభాగాలు <span class="accent-period">.</span></h2></div><span class="category-description">ప్రతి వార్తా విభాగాన్ని సులభంగా కనుగొనండి</span></div><div class="category-grid">@for (category of categories; track category.id; let index = $index) { @if (category.id !== 'all') {<button type="button" class="category-tile" (click)="chooseCategory(category.id)"><span class="category-index">0{{ index }}</span><span class="category-icon">{{ category.icon }}</span><span class="category-name">{{ category.label }}</span><span class="category-arrow">↗</span></button>}}</div></div></section>
+  <section class="container local-info-section" id="local-info" aria-labelledby="local-info-heading">
+    <div class="section-topline"><span class="section-count">MADANAPALLE LOCAL INFO</span><span class="line-fill"></span><span class="section-topline-end">GOLD • DEMO LISTINGS</span></div>
+    <div class="section-heading-row local-info-heading"><div><span class="overline">USEFUL COMMUNITY UPDATES</span><h2 id="local-info-heading">స్థానిక సమాచారం <span class="accent-period">.</span></h2></div><p>ధరలు, దుకాణం, స్థల వివరాలు — స్పష్టంగా గుర్తించిన నమూనా సమాచారంతో.</p></div>
+    <div class="local-info-grid">
+      <article class="info-column gold-column" aria-labelledby="gold-heading">
+        <div class="info-column-heading"><span class="info-icon gold-icon" aria-hidden="true">₹</span><div><span class="info-kicker">GOLD RATE • MADANAPALLE</span><h3 id="gold-heading">నేటి బంగారం ధర</h3></div></div>
+        <p class="rate-date">సూచిక ఆన్‌లైన్ ధరలు · 06 నవంబర్ 2026</p>
+        <div class="gold-rates">
+          <div class="gold-rate"><span>22 క్యారెట్లు</span><strong>₹13,623.04</strong><small>గ్రాముకు</small></div>
+          <div class="gold-rate"><span>24 క్యారెట్లు</span><strong>₹14,797.96</strong><small>గ్రాముకు</small></div>
+        </div>
+        <p class="rate-note">ధరలు రోజూ మారవచ్చు. ఈ సూచిక ధరలో GST, నగల తయారీ ఛార్జీలు లేవు. కొనుగోలు ముందు స్థానిక దుకాణంలో తాజా ధరను నిర్ధారించండి. <a href="https://paytm.com/tools/gold-rates/24k-gold-rates-madanapalle/" target="_blank" rel="noopener noreferrer">ధర మూలం ↗</a></p>
+        <div class="gold-demo-shop"><span class="demo-label">డెమో షాప్ ప్రకటన • నమూనా</span><h4>శ్రీ లక్ష్మి జ్యువెలర్స్ (డెమో)</h4><p>ప్రదర్శన కోసం రూపొందించిన నమూనా దుకాణం; నిజమైన వ్యాపారి కాదు.</p><div class="gold-benefits-title">బంగారం కొనుగోలులో ఉపయోగకరమైన విషయాలు</div><ul><li>నగలు, బహుమతులు లేదా నాణేల రూపంలో ఉపయోగించవచ్చు.</li><li>హాల్‌మార్క్, బరువు, నాణ్యత వివరాలను బిల్లులో పరిశీలించండి.</li><li>మేకింగ్ ఛార్జీలు, తిరిగి అమ్మకం నిబంధనలు ముందే తెలుసుకోండి.</li></ul></div>
+      </article>
+      <article class="info-column land-column" aria-labelledby="land-heading">
+        <div class="info-column-heading"><span class="info-icon land-icon" aria-hidden="true">⌂</span><div><span class="info-kicker">SAMPLE PROPERTY LISTINGS</span><h3 id="land-heading">భూములు & స్థలాలు</h3></div></div>
+        <p class="demo-notice">క్రింది ధరలు, చిరునామాలు పూర్తిగా డెమో కోసం మాత్రమే.</p>
+        <div class="land-listings">
+          <article class="land-card"><span class="land-tag">నమూనా ప్రకటన</span><h4>నివాస స్థలం · ఉదాహరణ A</h4><dl><div><dt>ప్రాంతం</dt><dd>మదనపల్లె పరిసరాలు</dd></div><div><dt>విస్తీర్ణం</dt><dd>150 చదరపు గజాలు</dd></div><div><dt>డెమో ధర</dt><dd>₹18.5 లక్షలు</dd></div></dl></article>
+          <article class="land-card"><span class="land-tag">నమూనా ప్రకటన</span><h4>వ్యవసాయ భూమి · ఉదాహరణ B</h4><dl><div><dt>ప్రాంతం</dt><dd>మదనపల్లె సమీపం</dd></div><div><dt>విస్తీర్ణం</dt><dd>1 ఎకరం</dd></div><div><dt>డెమో ధర</dt><dd>₹24 లక్షలు</dd></div></dl></article>
+        </div>
+        <p class="land-footnote">ఇక్కడ చూపినవి కల్పిత నమూనాలు; నిజమైన అమ్మకపు ప్రకటనలు కావు.</p>
+      </article>
+    </div>
+  </section>
 
   <section class="container youtube-cta" aria-labelledby="cta-title"><div class="cta-text"><span class="cta-topline">N95 NEWS • MADANAPALLE</span><h2 id="cta-title">వార్తలకు మరింత<br><em>దగ్గరగా ఉండండి.</em></h2><p>మా యూట్యూబ్ ఛానల్‌ను సబ్‌స్క్రైబ్ చేసి ప్రతి కొత్త వీడియో రిపోర్టును చూడండి.</p><div class="cta-actions"><a [href]="channelUrl + '?sub_confirmation=1'" target="_blank" rel="noopener noreferrer" class="cta-primary"><span>▶</span> Subscribe on YouTube ↗</a><a [href]="channelUrl" target="_blank" rel="noopener noreferrer" class="cta-secondary">Visit channel ↗</a></div></div><div class="cta-art" aria-hidden="true"><div class="cta-ring ring-one"></div><div class="cta-ring ring-two"></div><div class="cta-ring ring-three"></div><div class="cta-screen"><img src="assets/n95-original-logo.png" alt="" width="118" height="118"><span>N95 DIGITAL EDITION</span></div></div></section>
 
-  <section class="container about-section" id="about" aria-labelledby="about-title"><div class="about-head"><span class="section-count">04 / ABOUT N95 NEWS</span><span class="line-fill"></span></div><div class="about-grid"><div><span class="overline">OUR IDENTITY</span><h2 id="about-title">మదనపల్లె ప్రజల<br><span>స్వరానికి వేదిక.</span></h2></div><div class="about-body"><p><strong>N95 News MPL Telugu</strong> మదనపల్లె ప్రాంతానికి సంబంధించిన వార్తలు, ప్రజా సమస్యలు మరియు వీడియో రిపోర్టులను అందించే స్థానిక తెలుగు న్యూస్ ఛానల్.</p><p>మా నినాదం — <strong>“అనుక్షణం ప్రజలపక్షం...”</strong></p><a [href]="channelUrl" target="_blank" rel="noopener noreferrer">మా యూట్యూబ్ ఛానల్ <span aria-hidden="true">↗</span></a></div></div></section>
+  <section class="container about-section" id="about" aria-labelledby="about-title"><div class="about-head"><span class="section-count">ABOUT N95 NEWS</span><span class="line-fill"></span></div><div class="about-grid"><div><span class="overline">OUR IDENTITY</span><h2 id="about-title">మదనపల్లె ప్రజల<br><span>స్వరానికి వేదిక.</span></h2></div><div class="about-body"><p><strong>N95 News MPL Telugu</strong> మదనపల్లె ప్రాంతానికి సంబంధించిన వార్తలు, స్థానిక సమాచారం మరియు వీడియో రిపోర్టులను అందించే తెలుగు న్యూస్ ఛానల్.</p><p>మా నినాదం — <strong>“అనుక్షణం ప్రజలపక్షం...”</strong></p><a [href]="channelUrl" target="_blank" rel="noopener noreferrer">మా యూట్యూబ్ ఛానల్ <span aria-hidden="true">↗</span></a></div></div></section>
+  <div class="container editorial-note">AI ద్వారా రూపొందించిన వార్తా సారాంశాల్లో లోపాలు ఉండవచ్చు. పూర్తి సమాచారం కోసం అసలు YouTube వీడియోను చూడండి. సమీక్షించని సారాంశాలను సంపాదకీయం ధృవీకరించిన కథనాలుగా పరిగణించవద్దు.</div>
 </main>
 
-<footer class="site-footer"><div class="container footer-top"><div class="footer-brand"><img src="assets/n95-original-logo.png" alt="N95 News original logo" width="64" height="64"><div><strong>N95 NEWS MPL TELUGU</strong><span>అనుక్షణం ప్రజలపక్షం...</span></div></div><div class="footer-links"><a href="#top">హోమ్</a><a href="#latest-news">వార్తలు</a><a href="#categories">విభాగాలు</a><a href="#about">మా గురించి</a></div><a [href]="channelUrl" target="_blank" rel="noopener noreferrer" class="footer-social">YouTube <span>↗</span></a></div><div class="container footer-bottom"><span>© {{ currentYear }} N95 News MPL Telugu. All rights reserved.</span><span>MADANAPALLE • ANDHRA PRADESH • INDIA</span></div></footer>
+<footer class="site-footer"><div class="container footer-top"><div class="footer-brand"><img src="assets/n95-original-logo.png" alt="N95 News original logo" width="64" height="64"><div><strong>N95 NEWS MPL TELUGU</strong><span>అనుక్షణం ప్రజలపక్షం...</span></div></div><div class="footer-links"><a href="#top">హోమ్</a><a href="#latest-news">వార్తలు</a><a href="#local-info">స్థానిక సమాచారం</a><a href="#about">మా గురించి</a></div><a [href]="channelUrl" target="_blank" rel="noopener noreferrer" class="footer-social">YouTube <span>↗</span></a></div><div class="container footer-bottom"><span>© {{ currentYear }} N95 News MPL Telugu. All rights reserved.</span><span>MADANAPALLE • ANDHRA PRADESH • INDIA</span></div></footer>
+
+
+@if (selectedArticle(); as article) {
+  <div class="article-overlay" (click)="closeArticle()" (keydown.escape)="closeArticle()" tabindex="-1" role="presentation">
+    <article class="article-dialog" role="dialog" aria-modal="true" aria-label="పూర్తి వార్త" (click)="$event.stopPropagation()" (keydown.escape)="closeArticle()" tabindex="-1">
+      <header class="article-dialog-header">
+        <span>N95 NEWS MPL TELUGU • వార్త చదవండి</span>
+        <button type="button" (click)="closeArticle()" aria-label="వార్తను మూసివేయండి">✕</button>
+      </header>
+      <div class="article-dialog-content">
+        <span class="ai-disclosure">✦ {{ article.status === 'reviewed' ? 'సమీక్షించిన వార్త' : 'AI రూపొందించిన సారాంశం' }}</span>
+        <h2>{{ article.headline }}</h2>
+        @if (videoForArticle(article); as video) {
+          <p class="dialog-pub-date"><time [attr.datetime]="video.publishedAt">{{ formatDate(video.publishedAt) }}</time> @if (article.location) { • {{ article.location }} }</p>
+        }
+        <h3>వార్త సారాంశం</h3>
+        @if (article.lead) {<p class="article-lead">{{ article.lead }}</p>}<p class="article-full-summary">{{ article.summary }}</p>
+        <h3>ముఖ్యాంశాలు</h3>
+        <ul>@for (point of article.keyPoints; track $index) {<li>{{ point }}</li>}</ul>
+        <p class="ai-caution">{{ article.status === 'reviewed' ? 'మూలం: N95 News YouTube వీడియో.' : 'ఈ వార్త Gemini AI సారాంశం; పూర్తి నిర్ధారణ కోసం అసలు రిపోర్టును చూడండి.' }}</p>
+        <div class="article-actions">
+          <button type="button" class="watch-btn" (click)="watchFromArticle(article)">▶ వీడియో చూడండి</button>
+          @if (videoForArticle(article); as video) {<a class="read-btn" [href]="shareUrl(video)" target="_blank" rel="noopener noreferrer">షేర్ ↗</a>}
+        </div>
+      </div>
+    </article>
+  </div>
+}
 
 @if (selectedVideo(); as video) {
   <div class="video-overlay" (click)="closeVideo()" (keydown.escape)="closeVideo()" tabindex="-1" role="presentation">
@@ -140,4 +198,4 @@
   </div>
 }
 
-<nav class="mobile-bottom-nav" aria-label="త్వరిత నావిగేషన్"><a href="#top"><span>⌂</span>హోమ్</a><a href="#latest-news"><span>▤</span>వార్తలు</a><a href="#categories"><span>▦</span>విభాగాలు</a><a [href]="channelUrl" target="_blank" rel="noopener noreferrer"><span>▶</span>YouTube</a></nav>
+<nav class="mobile-bottom-nav" aria-label="త్వరిత నావిగేషన్"><a href="#top"><span>⌂</span>హోమ్</a><a href="#latest-news"><span>▤</span>వార్తలు</a><a href="#local-info"><span>₹</span>సమాచారం</a><a [href]="channelUrl" target="_blank" rel="noopener noreferrer"><span>▶</span>YouTube</a></nav>

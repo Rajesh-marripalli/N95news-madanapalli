@@ -1,0 +1,39 @@
+{
+  "channelId": "UChm8ZVGKr5RL3YZoxDkoSaA",
+  "generatedAt": "2026-10-30T19:23:43.883Z",
+  "articles": [],
+  "failures": {
+    "J0lXshUXutM": {
+      "attempts": 1,
+      "nextRetryAt": "2026-10-30T23:23:43.046Z"
+    },
+    "DZwsfLoRHvQ": {
+      "attempts": 1,
+      "nextRetryAt": "2026-10-30T23:23:43.209Z"
+    },
+    "hnls6Gr13gU": {
+      "attempts": 1,
+      "nextRetryAt": "2026-10-30T23:23:43.286Z"
+    },
+    "0K7XkTUvbuk": {
+      "attempts": 1,
+      "nextRetryAt": "2026-10-30T23:23:43.453Z"
+    },
+    "mtR8ejrix6c": {
+      "attempts": 1,
+      "nextRetryAt": "2026-10-30T23:23:43.534Z"
+    },
+    "4qP-9XUbx1M": {
+      "attempts": 1,
+      "nextRetryAt": "2026-10-30T23:23:43.672Z"
+    },
+    "LzISC6m31Wg": {
+      "attempts": 1,
+      "nextRetryAt": "2026-10-30T23:23:43.755Z"
+    },
+    "8LGSlOyr3Xo": {
+      "attempts": 1,
+      "nextRetryAt": "2026-10-30T23:23:43.883Z"
+    }
+  }
+}

@@ -7,7 +7,10 @@
     "dev": "ng serve --host 0.0.0.0",
     "build": "ng build --configuration production",
     "sync:youtube": "node scripts/sync-youtube.mjs",
-    "check": "node scripts/check-project.mjs"
+    "check": "node scripts/check-project.mjs",
+    "test:summaries": "node --test scripts/summarize-news.test.mjs",
+    "summarize:news": "node scripts/summarize-news.mjs",
+    "sync:all": "npm run sync:youtube && npm run summarize:news"
   },
   "dependencies": {
     "@angular/common": "^21.0.0",
@@ -25,5 +28,7 @@
     "sass": "^1.93.0",
     "typescript": "~5.9.2"
   },
-  "engines": {"node": "^20.19.0 || ^22.12.0 || ^24.0.0"}
+  "engines": {
+    "node": "^20.19.0 || ^22.12.0 || ^24.0.0"
+  }
 }

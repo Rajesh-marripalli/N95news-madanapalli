@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { CATEGORIES, Category, CHANNEL_URL, NewsFeed, NewsVideo } from './news.model';
+import { CHANNEL_URL, NewsArticle, NewsArticleFeed, NewsFeed, NewsVideo } from './news.model';
 
 @Component({
   selector: 'app-root',
@@ -16,7 +16,6 @@ export class AppComponent implements OnInit {
   private readonly sanitizer = inject(DomSanitizer);
 
   readonly channelUrl = CHANNEL_URL;
-  readonly categories = CATEGORIES;
   readonly currentYear = new Date().getFullYear();
   readonly today = new Intl.DateTimeFormat('te-IN', {
     timeZone: 'Asia/Kolkata', weekday: 'long', day: 'numeric', month: 'long', year: 'numeric'
@@ -25,27 +24,40 @@ export class AppComponent implements OnInit {
   readonly loading = signal(true);
   readonly loadFailed = signal(false);
   readonly feed = signal<NewsFeed | null>(null);
+  readonly articleFeed = signal<NewsArticleFeed | null>(null);
+  readonly selectedArticle = signal<NewsArticle | null>(null);
   readonly searchTerm = signal('');
-  readonly activeCategory = signal<Category>('all');
+  readonly onlyReadable = signal(false);
   readonly showCount = signal(9);
   readonly mobileMenuOpen = signal(false);
   readonly selectedVideo = signal<NewsVideo | null>(null);
 
   readonly videos = computed(() => this.feed()?.videos ?? []);
+  readonly articlesByVideo = computed(() => new Map(
+    (this.articleFeed()?.articles ?? []).map(article => [article.videoId, article])
+  ));
+  articleFor(video: NewsVideo): NewsArticle | undefined {
+    return this.articlesByVideo().get(video.id);
+  }
+  readonly summarizedCount = computed(() => this.articlesByVideo().size);
   readonly featured = computed(() => this.videos()[0] ?? null);
-  readonly highlights = computed(() => this.videos().slice(1, 5));
   readonly matchingVideos = computed(() => {
-    const category = this.activeCategory();
     const query = this.searchTerm().trim().toLocaleLowerCase();
     return this.videos().filter(video => {
-      const matchesCategory = category === 'all' || video.category === category;
-      const matchesQuery = !query || `${video.title} ${video.description}`.toLocaleLowerCase().includes(query);
-      return matchesCategory && matchesQuery;
+      const matchesReadable = !this.onlyReadable() || !!this.articleFor(video);
+      const matchesQuery = !query || `${video.title} ${video.description} ${this.articleFor(video)?.headline ?? ''} ${this.articleFor(video)?.summary ?? ''}`.toLocaleLowerCase().includes(query);
+      return matchesReadable && matchesQuery;
     });
   });
   readonly visibleVideos = computed(() => this.matchingVideos().slice(0, this.showCount()));
   readonly hasMore = computed(() => this.matchingVideos().length > this.showCount());
-  readonly activeLabel = computed(() => this.categories.find(c => c.id === this.activeCategory())?.label ?? 'అన్ని వార్తలు');
+  readonly featuredEmbedUrl = computed<SafeResourceUrl | null>(() => {
+    const id = this.featured()?.id;
+    if (!id || !/^[A-Za-z0-9_-]{11}$/.test(id)) return null;
+    return this.sanitizer.bypassSecurityTrustResourceUrl(
+      `https://www.youtube-nocookie.com/embed/${id}?rel=0`
+    );
+  });
   readonly embedUrl = computed<SafeResourceUrl | null>(() => {
     const id = this.selectedVideo()?.id;
     // Only valid YouTube IDs may be interpolated into an iframe URL.
@@ -57,7 +69,19 @@ export class AppComponent implements OnInit {
 
   ngOnInit(): void {
     // Relative URL respects Angular's <base href> on GitHub Pages project sites.
-    this.http.get<NewsFeed>('data/videos.json').subscribe({
+    this.http.get<NewsArticleFeed>(`data/news.json?v=${Date.now()}`).subscribe({
+      next: data => {
+        const articles = Array.isArray(data.articles) ? data.articles.filter(a =>
+          /^[A-Za-z0-9_-]{11}$/.test(a.videoId) &&
+          typeof a.headline === 'string' &&
+          typeof a.summary === 'string' &&
+          Array.isArray(a.keyPoints)
+        ) : [];
+        this.articleFeed.set({ ...data, articles });
+      },
+      error: () => { /* Videos remain available if AI summary JSON is absent. */ }
+    });
+    this.http.get<NewsFeed>(`data/videos.json?v=${Date.now()}`).subscribe({
       next: data => {
         const videos = Array.isArray(data.videos)
           ? data.videos.filter(v => /^[A-Za-z0-9_-]{11}$/.test(v.id))
@@ -72,13 +96,6 @@ export class AppComponent implements OnInit {
     });
   }
 
-  chooseCategory(category: Category, scroll = true): void {
-    this.activeCategory.set(category);
-    this.showCount.set(9);
-    this.mobileMenuOpen.set(false);
-    if (scroll) document.getElementById('latest-news')?.scrollIntoView({ behavior: 'smooth' });
-  }
-
   goTo(id: string): void {
     this.mobileMenuOpen.set(false);
     document.getElementById(id)?.scrollIntoView({ behavior: 'smooth' });
@@ -91,7 +108,7 @@ export class AppComponent implements OnInit {
 
   clearSearch(): void {
     this.searchTerm.set('');
-    this.activeCategory.set('all');
+    this.onlyReadable.set(false);
     this.showCount.set(9);
   }
 
@@ -103,8 +120,25 @@ export class AppComponent implements OnInit {
 
   closeVideo(): void { this.selectedVideo.set(null); }
 
+  readArticle(video: NewsVideo): void {
+    this.selectedArticle.set(this.articleFor(video) ?? null);
+  }
+
+  closeArticle(): void { this.selectedArticle.set(null); }
+
+  videoForArticle(article: NewsArticle): NewsVideo | undefined {
+    return this.videos().find(v => v.id === article.videoId);
+  }
+
+  watchFromArticle(article: NewsArticle): void {
+    const video = this.videoForArticle(article);
+    this.closeArticle();
+    if (video) this.openVideo(video);
+  }
+
   shareUrl(video: NewsVideo): string {
-    const text = `${video.title}\n${video.url}\n— N95 News MPL Telugu`;
+    const article = this.articleFor(video);
+    const text = `${article?.headline || video.title}\n${article?.lead || ''}\n${video.url}\n— N95 News MPL Telugu`;
     return `https://wa.me/?text=${encodeURIComponent(text)}`;
   }
 
