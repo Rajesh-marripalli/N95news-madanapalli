@@ -21,6 +21,7 @@
       <a href="#top" class="nav-active">హోమ్</a>
       <a href="#latest-news">వార్తలు చదవండి</a>
       <a href="#local-info">స్థానిక సమాచారం</a>
+      <a href="#plots">భూములు</a>
       <a href="#about">మా గురించి</a>
     </nav>
     <div class="header-actions">
@@ -38,6 +39,7 @@
       <a href="#top" (click)="mobileMenuOpen.set(false)">హోమ్</a>
       <a href="#latest-news" (click)="mobileMenuOpen.set(false)">తాజా వార్తలు</a>
       <a href="#local-info" (click)="mobileMenuOpen.set(false)">స్థానిక సమాచారం</a>
+      <a href="#plots" (click)="mobileMenuOpen.set(false)">భూములు & స్థలాలు</a>
       <a href="#about" (click)="mobileMenuOpen.set(false)">మా గురించి</a>
       <a [href]="channelUrl" target="_blank" rel="noopener noreferrer">YouTube ఛానల్ ↗</a>
     </nav>
@@ -67,8 +69,21 @@
       <div class="featured-video-shell skeleton feature-skeleton"></div>
     } @else if (featured(); as lead) {
       <article class="lead-story featured-video-story">
+        <header class="featured-headline"><div class="story-meta"><span>తాజా వీడియో రిపోర్ట్</span><span class="meta-dot"></span><time [attr.datetime]="lead.publishedAt">{{ formatDate(lead.publishedAt) }}</time></div><h2 id="hero-title">{{ articleFor(lead)?.headline || lead.title }}</h2>@if (articleFor(lead); as leadArticle) {@if (leadArticle.lead) {<p class="featured-lead">{{ leadArticle.lead }}</p>}}</header>
         <div class="featured-video-shell"><iframe [src]="featuredEmbedUrl()" [title]="lead.title" loading="eager" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
-        <div class="lead-info"><div class="story-meta"><span>తాజా వీడియో రిపోర్ట్</span><span class="meta-dot"></span><time [attr.datetime]="lead.publishedAt">{{ formatDate(lead.publishedAt) }}</time></div><h2 id="hero-title">{{ articleFor(lead)?.headline || lead.title }}</h2>@if (articleFor(lead); as leadArticle) {<p class="lead-ai-teaser">{{ leadArticle.lead || leadArticle.summary }}</p>}<div class="story-actions">@if (articleFor(lead)) {<button type="button" class="text-link" (click)="readArticle(lead)">📖 పూర్తి వార్త చదవండి</button>}<a [href]="lead.url" target="_blank" rel="noopener noreferrer" class="text-link">యూట్యూబ్‌లో చూడండి ↗</a><a [href]="shareUrl(lead)" target="_blank" rel="noopener noreferrer" class="share-link" aria-label="వాట్సాప్‌లో షేర్ చేయండి">↗ <span>షేర్</span></a></div></div>
+        <div class="lead-info featured-summary-block">
+          @if (articleFor(lead); as leadArticle) {
+            <span class="ai-disclosure">✦ {{ leadArticle.status === 'reviewed' ? 'సంపాదకీయం పరిశీలించిన వార్త' : 'AI రూపొందించిన సారాంశం' }} · 2 నిమిషాల చదువు</span>
+            <h3>వీడియో యొక్క వివరణాత్మక సారాంశం</h3>
+            <p class="featured-full-summary">{{ leadArticle.summary }}</p>
+            <div class="readable-label">ముఖ్యాంశాలు</div>
+            <ul class="featured-points">@for (point of leadArticle.keyPoints; track $index) {<li>{{ point }}</li>}</ul>
+          } @else {
+            <h3>వీడియో సారాంశం</h3>
+            <p class="summary-pending">ఈ వీడియోకు వివరణాత్మక తెలుగు సారాంశం ఇంకా సిద్ధం కాలేదు. సారాంశం అందుబాటులోకి వచ్చిన వెంటనే ఇక్కడ పూర్తి వివరాలు చూపిస్తాం.</p>
+          }
+          <div class="story-actions">@if (articleFor(lead)) {<button type="button" class="text-link" (click)="readArticle(lead)">📖 పూర్తి వార్త చదవండి</button>}<a [href]="lead.url" target="_blank" rel="noopener noreferrer" class="text-link">యూట్యూబ్‌లో చూడండి ↗</a><a [href]="shareUrl(lead)" target="_blank" rel="noopener noreferrer" class="share-link" aria-label="వాట్సాప్‌లో షేర్ చేయండి">↗ <span>షేర్</span></a></div>
+        </div>
       </article>
     } @else {
       <div class="hero-placeholder"><div class="hero-pattern"><span class="hero-pattern-circle"></span><span class="placeholder-issue">N95 / NEWS</span><span class="placeholder-giant">MPL</span></div><div class="placeholder-content"><span class="placeholder-pill">మదనపల్లె • తెలుగు న్యూస్</span><h2>వార్తలు నేరుగా<br><span>మీ ముందుకు.</span></h2><p>కొత్త వీడియో రిపోర్టులు ప్రచురించినప్పుడు ఇక్కడ కనిపిస్తాయి. అప్పటివరకు మా అధికారిక YouTube ఛానల్‌లో చూడండి.</p><a [href]="channelUrl" target="_blank" rel="noopener noreferrer" class="light-btn">YouTube లో చూడండి ↗</a></div></div>
@@ -92,7 +107,7 @@
             <div class="card-body readable-card-body">
               <div class="story-meta"><span>N95 NEWS • తెలుగు</span><span class="meta-dot"></span><time [attr.datetime]="video.publishedAt">{{ formatDate(video.publishedAt) }}</time></div>
               @if (articleFor(video); as article) {
-                <span class="ai-disclosure">✦ {{ article.status === 'reviewed' ? 'సంపాదకీయం పరిశీలించిన వార్త' : 'AI రూపొందించిన సారాంశం' }} · 1 నిమిషంలో చదవండి</span>
+                <span class="ai-disclosure">✦ {{ article.status === 'reviewed' ? 'సంపాదకీయం పరిశీలించిన వార్త' : 'AI రూపొందించిన సారాంశం' }} · వివరమైన వార్త</span>
                 <h3 class="readable-headline">{{ article.headline }}</h3>
                 @if (article.lead) {<p class="news-lead">{{ article.lead }}</p>}
                 <div class="readable-label">వార్త సారాంశం</div>
@@ -128,7 +143,7 @@
 
   <section class="container local-info-section" id="local-info" aria-labelledby="local-info-heading">
     <div class="section-topline"><span class="section-count">MADANAPALLE LOCAL INFO</span><span class="line-fill"></span><span class="section-topline-end">GOLD • DEMO LISTINGS</span></div>
-    <div class="section-heading-row local-info-heading"><div><span class="overline">USEFUL COMMUNITY UPDATES</span><h2 id="local-info-heading">స్థానిక సమాచారం <span class="accent-period">.</span></h2></div><p>ధరలు, దుకాణం, స్థల వివరాలు — స్పష్టంగా గుర్తించిన నమూనా సమాచారంతో.</p></div>
+    <div class="section-heading-row local-info-heading"><div><span class="overline">USEFUL COMMUNITY UPDATES</span><h2 id="local-info-heading">స్థానిక సమాచారం <span class="accent-period">.</span></h2></div><p>మదనపల్లెకు ఉపయోగపడే బంగారం ధరలు, కొనుగోలు సమాచారం.</p></div>
     <div class="local-info-grid">
       <article class="info-column gold-column" aria-labelledby="gold-heading">
         <div class="info-column-heading"><span class="info-icon gold-icon" aria-hidden="true">₹</span><div><span class="info-kicker">GOLD RATE • MADANAPALLE</span><h3 id="gold-heading">నేటి బంగారం ధర</h3></div></div>
@@ -140,16 +155,26 @@
         <p class="rate-note">ధరలు రోజూ మారవచ్చు. ఈ సూచిక ధరలో GST, నగల తయారీ ఛార్జీలు లేవు. కొనుగోలు ముందు స్థానిక దుకాణంలో తాజా ధరను నిర్ధారించండి. <a href="https://paytm.com/tools/gold-rates/24k-gold-rates-madanapalle/" target="_blank" rel="noopener noreferrer">ధర మూలం ↗</a></p>
         <div class="gold-demo-shop"><span class="demo-label">డెమో షాప్ ప్రకటన • నమూనా</span><h4>శ్రీ లక్ష్మి జ్యువెలర్స్ (డెమో)</h4><p>ప్రదర్శన కోసం రూపొందించిన నమూనా దుకాణం; నిజమైన వ్యాపారి కాదు.</p><div class="gold-benefits-title">బంగారం కొనుగోలులో ఉపయోగకరమైన విషయాలు</div><ul><li>నగలు, బహుమతులు లేదా నాణేల రూపంలో ఉపయోగించవచ్చు.</li><li>హాల్‌మార్క్, బరువు, నాణ్యత వివరాలను బిల్లులో పరిశీలించండి.</li><li>మేకింగ్ ఛార్జీలు, తిరిగి అమ్మకం నిబంధనలు ముందే తెలుసుకోండి.</li></ul></div>
       </article>
-      <article class="info-column land-column" aria-labelledby="land-heading">
-        <div class="info-column-heading"><span class="info-icon land-icon" aria-hidden="true">⌂</span><div><span class="info-kicker">SAMPLE PROPERTY LISTINGS</span><h3 id="land-heading">భూములు & స్థలాలు</h3></div></div>
-        <p class="demo-notice">క్రింది ధరలు, చిరునామాలు పూర్తిగా డెమో కోసం మాత్రమే.</p>
-        <div class="land-listings">
-          <article class="land-card"><span class="land-tag">నమూనా ప్రకటన</span><h4>నివాస స్థలం · ఉదాహరణ A</h4><dl><div><dt>ప్రాంతం</dt><dd>మదనపల్లె పరిసరాలు</dd></div><div><dt>విస్తీర్ణం</dt><dd>150 చదరపు గజాలు</dd></div><div><dt>డెమో ధర</dt><dd>₹18.5 లక్షలు</dd></div></dl></article>
-          <article class="land-card"><span class="land-tag">నమూనా ప్రకటన</span><h4>వ్యవసాయ భూమి · ఉదాహరణ B</h4><dl><div><dt>ప్రాంతం</dt><dd>మదనపల్లె సమీపం</dd></div><div><dt>విస్తీర్ణం</dt><dd>1 ఎకరం</dd></div><div><dt>డెమో ధర</dt><dd>₹24 లక్షలు</dd></div></dl></article>
-        </div>
-        <p class="land-footnote">ఇక్కడ చూపినవి కల్పిత నమూనాలు; నిజమైన అమ్మకపు ప్రకటనలు కావు.</p>
-      </article>
     </div>
+  </section>
+
+  <section class="container plots-section" id="plots" aria-labelledby="plots-heading">
+    <div class="section-topline"><span class="section-count">PLOTS • DEMO LISTINGS</span><span class="line-fill"></span><span class="section-topline-end">10 SAMPLE PROPERTIES</span></div>
+    <div class="section-heading-row plots-heading-row"><div><span class="overline">LAND & PLOTS</span><h2 id="plots-heading">భూములు & స్థలాలు <span class="accent-period">.</span></h2></div><p>చిత్రాలు, ధరలు, పరిమాణాలు మరియు సంప్రదింపు నంబర్లు డెమో కోసం మాత్రమే.</p></div>
+    <div class="plots-grid">
+      @for (plot of plots(); track plot.id) {
+        <article class="plot-card">
+          <div class="plot-image-wrap"><img [src]="plot.image" [alt]="plot.imageAlt" loading="lazy"><span class="plot-demo-badge">DEMO • నమూనా</span><span class="plot-type-badge">{{ plot.type }}</span></div>
+          <div class="plot-card-body">
+            <div class="plot-card-title"><h3>{{ plot.title }}</h3><span>{{ plot.location }}</span></div>
+            <div class="plot-price"><small>నమూనా ధర</small><strong>{{ plot.price }}</strong></div>
+            <dl class="plot-details"><div><dt>విస్తీర్ణం</dt><dd>{{ plot.area }}</dd></div><div><dt>కొలతలు</dt><dd>{{ plot.dimensions }}</dd></div><div><dt>ఫేసింగ్</dt><dd>{{ plot.facing }}</dd></div></dl>
+            <div class="plot-contact"><span aria-hidden="true">☎</span><div><small>డెమో ఫోన్ నంబర్</small><strong>{{ plot.phone }}</strong></div></div>
+          </div>
+        </article>
+      }
+    </div>
+    <p class="plots-disclaimer">ఈ పది జాబితాలు పూర్తిగా కల్పితం. స్థలాలు, చిత్రాలు, ధరలు, ఫోన్ నంబర్లు నిజమైన ప్రకటనలు లేదా సంప్రదింపులు కావు.</p>
   </section>
 
   <section class="container youtube-cta" aria-labelledby="cta-title"><div class="cta-text"><span class="cta-topline">N95 NEWS • MADANAPALLE</span><h2 id="cta-title">వార్తలకు మరింత<br><em>దగ్గరగా ఉండండి.</em></h2><p>మా యూట్యూబ్ ఛానల్‌ను సబ్‌స్క్రైబ్ చేసి ప్రతి కొత్త వీడియో రిపోర్టును చూడండి.</p><div class="cta-actions"><a [href]="channelUrl + '?sub_confirmation=1'" target="_blank" rel="noopener noreferrer" class="cta-primary"><span>▶</span> Subscribe on YouTube ↗</a><a [href]="channelUrl" target="_blank" rel="noopener noreferrer" class="cta-secondary">Visit channel ↗</a></div></div><div class="cta-art" aria-hidden="true"><div class="cta-ring ring-one"></div><div class="cta-ring ring-two"></div><div class="cta-ring ring-three"></div><div class="cta-screen"><img src="assets/n95-original-logo.png" alt="" width="118" height="118"><span>N95 DIGITAL EDITION</span></div></div></section>
@@ -158,7 +183,7 @@
   <div class="container editorial-note">AI ద్వారా రూపొందించిన వార్తా సారాంశాల్లో లోపాలు ఉండవచ్చు. పూర్తి సమాచారం కోసం అసలు YouTube వీడియోను చూడండి. సమీక్షించని సారాంశాలను సంపాదకీయం ధృవీకరించిన కథనాలుగా పరిగణించవద్దు.</div>
 </main>
 
-<footer class="site-footer"><div class="container footer-top"><div class="footer-brand"><img src="assets/n95-original-logo.png" alt="N95 News original logo" width="64" height="64"><div><strong>N95 NEWS MPL TELUGU</strong><span>అనుక్షణం ప్రజలపక్షం...</span></div></div><div class="footer-links"><a href="#top">హోమ్</a><a href="#latest-news">వార్తలు</a><a href="#local-info">స్థానిక సమాచారం</a><a href="#about">మా గురించి</a></div><a [href]="channelUrl" target="_blank" rel="noopener noreferrer" class="footer-social">YouTube <span>↗</span></a></div><div class="container footer-bottom"><span>© {{ currentYear }} N95 News MPL Telugu. All rights reserved.</span><span>MADANAPALLE • ANDHRA PRADESH • INDIA</span></div></footer>
+<footer class="site-footer"><div class="container footer-top"><div class="footer-brand"><img src="assets/n95-original-logo.png" alt="N95 News original logo" width="64" height="64"><div><strong>N95 NEWS MPL TELUGU</strong><span>అనుక్షణం ప్రజలపక్షం...</span></div></div><div class="footer-links"><a href="#top">హోమ్</a><a href="#latest-news">వార్తలు</a><a href="#local-info">స్థానిక సమాచారం</a><a href="#plots">భూములు</a><a href="#about">మా గురించి</a></div><a [href]="channelUrl" target="_blank" rel="noopener noreferrer" class="footer-social">YouTube <span>↗</span></a></div><div class="container footer-bottom"><span>© {{ currentYear }} N95 News MPL Telugu. All rights reserved.</span><span>MADANAPALLE • ANDHRA PRADESH • INDIA</span></div></footer>
 
 
 @if (selectedArticle(); as article) {
@@ -198,4 +223,4 @@
   </div>
 }
 
-<nav class="mobile-bottom-nav" aria-label="త్వరిత నావిగేషన్"><a href="#top"><span>⌂</span>హోమ్</a><a href="#latest-news"><span>▤</span>వార్తలు</a><a href="#local-info"><span>₹</span>సమాచారం</a><a [href]="channelUrl" target="_blank" rel="noopener noreferrer"><span>▶</span>YouTube</a></nav>
+<nav class="mobile-bottom-nav" aria-label="త్వరిత నావిగేషన్"><a href="#top"><span>⌂</span>హోమ్</a><a href="#latest-news"><span>▤</span>వార్తలు</a><a href="#plots"><span>⌂</span>భూములు</a><a [href]="channelUrl" target="_blank" rel="noopener noreferrer"><span>▶</span>YouTube</a></nav>

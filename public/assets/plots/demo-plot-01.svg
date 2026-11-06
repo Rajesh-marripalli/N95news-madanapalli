@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-label="Illustrated demo residential plots">
+  <defs>
+    <linearGradient id="sky" x2="0" y2="1"><stop stop-color="#d8edf5"/><stop offset="1" stop-color="#f8f2d8"/></linearGradient>
+    <linearGradient id="land" x2="0" y2="1"><stop stop-color="#a7c87b"/><stop offset="1" stop-color="#638f54"/></linearGradient>
+    <pattern id="rows" width="46" height="46" patternUnits="userSpaceOnUse" patternTransform="skewY(-18)"><path d="M0 0V46" stroke="#dce7b0" stroke-width="3" opacity=".7"/></pattern>
+  </defs>
+  <rect width="800" height="250" fill="url(#sky)"/><circle cx="660" cy="82" r="43" fill="#f7d985"/>
+  <path d="M0 235 135 130l108 92 142-119 154 128 100-84 161 99v60H0Z" fill="#9db7a0"/>
+  <path d="M0 252h800v198H0z" fill="url(#land)"/><path d="M0 290h800v160H0z" fill="url(#rows)"/>
+  <path d="M0 390 290 265h185l-57 185H0Z" fill="#bcb9a7"/><path d="M20 391 306 270" stroke="#f6f1db" stroke-width="7" stroke-dasharray="24 24"/>
+  <g fill="none" stroke="#f5f5dc" stroke-width="5"><path d="M360 278 321 450M455 278 416 450M555 278 516 450M658 278 619 450M300 335h500M269 390h531"/></g>
+  <g fill="#4c7b4e"><circle cx="102" cy="278" r="22"/><circle cx="161" cy="265" r="18"/><circle cx="742" cy="251" r="23"/><circle cx="700" cy="261" r="17"/></g>
+  <rect x="24" y="22" width="160" height="36" rx="18" fill="#ffffffd9"/><text x="104" y="46" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#274d40">DEMO LAND</text>
+</svg>

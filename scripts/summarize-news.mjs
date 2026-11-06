@@ -21,7 +21,7 @@ const SCHEMA = {
     speechVerified: { type: 'boolean', description: 'True only if the spoken audio or narration was actually understood' },
     headline: { type: 'string', description: 'Clear factual but interesting Telugu headline' },
     lead: { type: 'string', description: 'One-sentence engaging and factual Telugu preview, 15–30 words' },
-    summary: { type: 'string', description: 'Natural 60–110 word Telugu summary of the spoken report' },
+    summary: { type: 'string', description: 'Detailed natural Telugu summary of the spoken report, approximately 180–240 words in three short paragraphs' },
     keyPoints: { type: 'array', items: { type: 'string' }, minItems: 3, maxItems: 3, description: 'Exactly three distinct facts from the spoken report' },
     location: { type: 'string', description: 'Location stated in the report, else empty string' }
   },
@@ -36,7 +36,7 @@ Return EXACTLY one JSON object with these fields:\n
 speechVerified: false when audio is inaccessible, inaudible, no spoken report, or you could only use metadata. In that case, all text fields must be empty and keyPoints must be [].\n
 headline: a specific, useful factual Telugu headline, ideally 7–14 words.\n
 lead: one short interesting Telugu lead sentence (~15–30 words) capturing the most important development.\n
-summary: a journalistic 60–110 word Telugu summary explaining who, what, where and why only when spoken. Keep it straightforward, not repetitive.\n
+summary: a detailed journalistic summary in natural Telugu, approximately 180–240 words across three short paragraphs. Explain who, what, where and why only when each detail is stated in the audio. Cover the central event, important supporting details, and any response or next step actually mentioned. Keep it straightforward and readable without repeating the headline or lead.\n
 keyPoints: exactly THREE different Telugu facts or clearly attributed statements, 1 sentence each; no generic bullet points.\n
 location: actual location spoken, or an empty string.\n
 Accuracy: No fictional names, dates, places, quotations, numbers, cause, legal guilt, political claims, official reactions or actions. Attribute allegations to speakers, without presenting them as established facts. If evidence is missing, omit it. Do not repeat the headline verbatim as lead. Every assertion must be traceable to the speech. Return only JSON.`;
@@ -70,7 +70,7 @@ export function normalizeSummary(result, video, model = MODEL, now = new Date())
   const lead = String(result?.lead ?? '').trim();
   const summary = String(result?.summary ?? '').trim();
   const points = Array.isArray(result?.keyPoints) ? result.keyPoints.map(x => String(x).trim()).filter(Boolean) : [];
-  if (headline.length < 12 || lead.length < 24 || summary.length < 80 || points.length !== 3 ||
+  if (headline.length < 12 || lead.length < 24 || summary.length < 200 || points.length !== 3 ||
       points.some(p => p.length < 12)) throw new Error('Incomplete or too-short article rejected');
   if (![headline, lead, summary, ...points].every(v => TELUGU.test(v))) {
     throw new Error('Telugu content is required in headline, lead, summary and every key point');
@@ -80,7 +80,7 @@ export function normalizeSummary(result, video, model = MODEL, now = new Date())
     videoId: video.id,
     headline: headline.slice(0, 200),
     lead: lead.slice(0, 330),
-    summary: summary.slice(0, 1800),
+    summary: summary.slice(0, 3000),
     keyPoints: points.map(p => p.slice(0, 320)),
     location: String(result.location ?? '').trim().slice(0, 120),
     generatedAt: now.toISOString(),

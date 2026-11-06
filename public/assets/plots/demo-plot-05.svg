@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-label="Illustrated demo agricultural land">
+  <defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#b9dce8"/><stop offset="1" stop-color="#fff0d0"/></linearGradient><linearGradient id="field" x2="0" y2="1"><stop stop-color="#b8c76d"/><stop offset="1" stop-color="#607c3d"/></linearGradient><pattern id="furrows" width="60" height="24" patternUnits="userSpaceOnUse" patternTransform="skewY(-15)"><path d="M0 0v24" stroke="#e2d99a" stroke-width="8" opacity=".85"/></pattern></defs>
+  <rect width="800" height="229" fill="url(#sky)"/><circle cx="666" cy="76" r="40" fill="#f8d474"/><path d="m0 225 114-87 115 72 144-112 150 104 102-77 175 100v47H0z" fill="#849c75"/>
+  <path d="M0 245h800v205H0z" fill="url(#field)"/><path d="M0 245h800v205H0z" fill="url(#furrows)"/>
+  <path d="M0 373 800 330v120H0z" fill="#b5b19d"/><path d="M0 394 800 351" stroke="#faf3da" stroke-width="6" stroke-dasharray="24 22"/>
+  <path d="M185 261h390v100H185z" fill="#86a956" stroke="#f8edc7" stroke-width="5"/><path d="M314 261v100m131-100v100M185 311h390" stroke="#f8edc7" stroke-width="4"/>
+  <g fill="#467148"><circle cx="75" cy="273" r="27"/><circle cx="115" cy="262" r="21"/><circle cx="690" cy="254" r="26"/><circle cx="735" cy="270" r="18"/></g>
+  <rect x="24" y="22" width="160" height="36" rx="18" fill="#ffffffd9"/><text x="104" y="46" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#274d40">DEMO LAND</text>
+</svg>

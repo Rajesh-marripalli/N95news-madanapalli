@@ -29,6 +29,26 @@ export interface NewsArticleFeed {
   articles: NewsArticle[];
 }
 
+export interface PlotListing {
+  id: string;
+  title: string;
+  type: string;
+  location: string;
+  area: string;
+  dimensions: string;
+  facing: string;
+  price: string;
+  phone: string;
+  image: string;
+  imageAlt: string;
+}
+
+export interface PlotFeed {
+  generatedAt: string;
+  demo: true;
+  listings: PlotListing[];
+}
+
 export interface NewsFeed {
   channelId: string;
   source: string;

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-label="Illustrated demo roadside plot">
+  <defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#c5e2eb"/><stop offset="1" stop-color="#faf0d8"/></linearGradient><linearGradient id="earth" x2="0" y2="1"><stop stop-color="#a7c27d"/><stop offset="1" stop-color="#64824c"/></linearGradient></defs>
+  <rect width="800" height="225" fill="url(#sky)"/><path d="M0 221 131 126l119 91 146-126 154 120 96-83 154 99v48H0z" fill="#92ab91"/><path d="M0 238h800v139H0z" fill="url(#earth)"/>
+  <path d="M0 345 800 260v190H0z" fill="#aaa99f"/><path d="M0 367 800 281" stroke="#f7f0d8" stroke-width="7" stroke-dasharray="27 23"/>
+  <path d="M183 257h389v92H183z" fill="#97b96d" stroke="#fff4d7" stroke-width="5"/><path d="M183 303h389m-259-46v92m131-92v92" stroke="#fff4d7" stroke-width="4"/>
+  <g fill="#477247"><circle cx="98" cy="270" r="26"/><circle cx="134" cy="269" r="19"/><circle cx="624" cy="250" r="22"/><circle cx="728" cy="239" r="28"/></g>
+  <rect x="24" y="22" width="160" height="36" rx="18" fill="#ffffffd9"/><text x="104" y="46" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#274d40">DEMO LAND</text>
+</svg>

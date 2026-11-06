@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" role="img" aria-label="Illustrated demo green plot layout">
+  <defs><linearGradient id="sky" x2="0" y2="1"><stop stop-color="#bddde8"/><stop offset="1" stop-color="#f7edcf"/></linearGradient><linearGradient id="ground" x2="0" y2="1"><stop stop-color="#8fb677"/><stop offset="1" stop-color="#476f49"/></linearGradient><pattern id="grass" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M3 28 8 18m10 10 5-9" stroke="#b9d090" stroke-width="2" opacity=".7"/></pattern></defs>
+  <rect width="800" height="235" fill="url(#sky)"/><circle cx="130" cy="90" r="38" fill="#f5d77c"/><path d="m0 232 155-95 102 77 130-110 145 113 95-75 173 94v50H0z" fill="#92aa8b"/>
+  <path d="M0 260h800v190H0z" fill="url(#ground)"/><path d="M0 260h800v190H0z" fill="url(#grass)"/>
+  <path d="M90 265h630v144H90z" fill="#87ad6f" stroke="#f3f1d9" stroke-width="5"/><g fill="none" stroke="#f3f1d9" stroke-width="4"><path d="M216 265v144m126-144v144m126-144v144m126-144v144M90 337h630"/></g>
+  <path d="M0 409h800v41H0z" fill="#b8b7a9"/><path d="M22 430h756" stroke="#faf6df" stroke-width="4" stroke-dasharray="20 18"/>
+  <g fill="#3f7048"><circle cx="57" cy="293" r="27"/><circle cx="751" cy="293" r="27"/><circle cx="57" cy="360" r="23"/><circle cx="751" cy="359" r="23"/></g>
+  <rect x="24" y="22" width="160" height="36" rx="18" fill="#ffffffd9"/><text x="104" y="46" text-anchor="middle" font-family="Arial,sans-serif" font-size="16" font-weight="700" fill="#274d40">DEMO LAND</text>
+</svg>

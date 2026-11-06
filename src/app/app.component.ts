@@ -2,7 +2,7 @@ import { DatePipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, computed, inject, OnInit, signal } from '@angular/core';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { CHANNEL_URL, NewsArticle, NewsArticleFeed, NewsFeed, NewsVideo } from './news.model';
+import { CHANNEL_URL, NewsArticle, NewsArticleFeed, NewsFeed, NewsVideo, PlotFeed, PlotListing } from './news.model';
 
 @Component({
   selector: 'app-root',
@@ -25,6 +25,7 @@ export class AppComponent implements OnInit {
   readonly loadFailed = signal(false);
   readonly feed = signal<NewsFeed | null>(null);
   readonly articleFeed = signal<NewsArticleFeed | null>(null);
+  readonly plots = signal<PlotListing[]>([]);
   readonly selectedArticle = signal<NewsArticle | null>(null);
   readonly searchTerm = signal('');
   readonly onlyReadable = signal(false);
@@ -93,6 +94,10 @@ export class AppComponent implements OnInit {
         this.loadFailed.set(true);
         this.loading.set(false);
       }
+    });
+    this.http.get<PlotFeed>('data/plots.json').subscribe({
+      next: data => this.plots.set(Array.isArray(data.listings) ? data.listings : []),
+      error: () => this.plots.set([])
     });
   }
 
